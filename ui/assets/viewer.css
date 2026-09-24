@@ -90,10 +90,6 @@ html[data-em-skin] body { background: var(--bg, transparent); }
   border-radius: 0;
   padding: 8px 10px;
 }
-#toolbar .title {
-  flex: 0 0 auto; color: var(--em-c-text); font-size: 20px; font-weight: 700;
-  letter-spacing: 1px; margin-right: 6px; white-space: nowrap;
-}
 .btn {
   position: relative; z-index: 1; flex: 0 0 auto; min-height: 32px;
   background: transparent; color: var(--em-c-text-light);

@@ -32,6 +32,7 @@
 - 2026-09-24：移除右下空态提示条（`#info:empty` 自动隐藏，有内容时才出现）
 - 2026-09-24：坐标轴重做：细杆 + 小锥头 + 中心球 + 标准材质吃光照 + X/Y/Z 字标，配色随主题深浅换档；画布 84→104px、相机距离 4.0→5.0 让字标落进视锥
 - 2026-09-24：改名 3.1.0：id `easymodel-viewer` → `hana-model-viewer`，显示名 `Hana-model-viewer`，中文名「小花模型查看器」，卡片 id → `viewer`，工具名 → `hana_model_viewer_open_model`
+- 2026-09-24：移除工具栏品牌字「小花」（`<span class="title">` 与对应 `#toolbar .title` 规则），顶栏从「标题 + 按钮」变为纯按钮组
 
 ## 功能验证清单
 
@@ -49,7 +50,8 @@
 
 ### 前端 UI
 
-- [ ] 窄卡片（320px）下逐个验证：打开文件、打开文件夹、线框、自转、网格、视角、颜色、外观、光源
+- [x] 顶栏入口代理侧点击验证（实测 2026-09-24）：`btn-pick` / `btn-folder` / `btn-wire` / `btn-rotate` / `btn-grid` / `btn-fit` / `btn-color` / `btn-theme` / `btn-light` / `btn-light-def` 全部可被 `ui_action.click_element` 定位并返回 `clicked:true`；`view-menu` 与 `color-menu` 打开后其下拉项（`hana-ui-4` 前视、`hana-ui-10` 色板）同样可点
+- [ ] 窄卡片（320px）下逐个验证：打开文件、打开文件夹、线框、自转、网格、视角、颜色、外观、光源（需人工缩窄卡片确认视觉与手感）
 - [ ] 视角下拉、颜色下拉的层级与外部点击关闭
 - [ ] 打开文件夹后的预览条横向滚动与点选
 - [ ] 切换宿主主题（含自命名主题）时背景、工具栏、坐标轴配色跟随
@@ -60,7 +62,7 @@
 
 - [x] 宿主发现并加载：`plugin "hana-model-viewer" … loaded`（v3.0.0 时验证）
 - [x] 官方 validator：0 error / 1 warning（`DYNAMIC_DEPENDENCIES_NOT_PROVEN`，动态依赖无法静态证明）
-- [ ] 改名后（3.1.0）重新批准与加载验证
+- [x] 改名后（3.1.0）重新批准与加载验证 — 2026-09-24 21:51 宿主日志：`plugin "hana-model-viewer" v3.1.0 loaded`，路由 `v2-hana-model-viewer` 注册成功
 
 ## 已知问题 / TODO
 
@@ -91,3 +93,4 @@
 
 - 2026-08-26 — 开发中审查 — 大姐 — v1 静态检查、dev 加载、`open_model` 回归通过；逐项点击验证未执行
 - 2026-09-24 — 迁移审查 — 大姐 — v2 官方 validator 通过（0 error）、`index.js` 与 `viewer.js` 语法通过、宿主装载成功；改名后重新验证待执行
+- 2026-09-24 — 改名后验证 — 大姐 — 宿主 3.1.0 装载通过（`plugin "hana-model-viewer" v3.1.0 loaded`）；开卡渲染正常（信息条、坐标轴、工具栏均在位）；顶栏与两个下拉的代理侧点击全部命中（实测）；窄卡手感与视觉结果待人工确认
