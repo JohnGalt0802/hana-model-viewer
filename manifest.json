@@ -1,0 +1,35 @@
+{
+  "manifestVersion": 2,
+  "id": "hana-model-viewer",
+  "name": "Hana-model-viewer",
+  "version": "3.1.0",
+  "description": "小花模型查看器（v2 App）：在 Hana 工作台直接渲染 STL / OBJ / PLY / GLB / GLTF / 3MF / STEP / IGES 工程模型。支持打开文件或文件夹并横向预览多个模型，作为卡片在工作台任意位置摆放，可拆成独立窗口；界面背景与配色跟随宿主主题。",
+  "entry": "index.js",
+  "icon": "assets/icon.png",
+  "minAppVersion": "0.1023.1",
+  "capabilities": [
+    "app/tools.expose-to-model",
+    "app/resources.read"
+  ],
+  "contributes": {
+    "cards": [
+      {
+        "id": "viewer",
+        "title": "小花模型查看器",
+        "description": "在卡片中渲染 3D 工程模型（STL/OBJ/PLY/GLB/GLTF/3MF/STEP/IGES），支持打开文件、打开文件夹、视角切换、自转、线框、网格、颜色与光源调整，外观跟随宿主主题。",
+        "route": "/viewer.html",
+        "cardForm": "flush",
+        "detached": {
+          "route": "/viewer.html"
+        },
+        "detachedDefaultSize": {
+          "width": 1100,
+          "height": 720
+        },
+        "face": {
+          "image": "assets/cover.png"
+        }
+      }
+    ]
+  }
+}

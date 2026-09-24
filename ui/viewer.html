@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小花模型查看器</title>
+  <link rel="stylesheet" href="./assets/viewer.css">
+</head>
+<body>
+  <div id="app">
+    <div id="toolbar">
+      <span class="title">小花</span>
+      <button type="button" class="btn" id="btn-pick">打开文件</button>
+      <button type="button" class="btn" id="btn-folder">打开文件夹</button>
+      <button type="button" class="btn" id="btn-wire" aria-pressed="false">线框</button>
+      <button type="button" class="btn" id="btn-rotate" aria-pressed="false">自转</button>
+      <button type="button" class="btn" id="btn-grid" aria-pressed="false">网格</button>
+      <div class="dd" id="view-dd">
+        <button type="button" class="btn" id="btn-fit">视角 ▾</button>
+        <div class="dd-menu" id="view-menu">
+          <button type="button" class="dd-item" data-act="reset">重置视角</button>
+          <button type="button" class="dd-item" data-act="persp">persp</button>
+          <button type="button" class="dd-item" data-act="ortho">正交</button>
+          <div class="dd-sec">正视方向</div>
+          <button type="button" class="dd-item" data-face="front">前视</button>
+          <button type="button" class="dd-item" data-face="back">后视</button>
+          <button type="button" class="dd-item" data-face="left">左视</button>
+          <button type="button" class="dd-item" data-face="right">右视</button>
+          <button type="button" class="dd-item" data-face="top">俯视</button>
+          <button type="button" class="dd-item" data-face="bottom">仰视</button>
+        </div>
+      </div>
+      <div class="dd" id="color-dd">
+        <button type="button" class="btn" id="btn-color">颜色 ▾</button>
+        <div class="dd-menu color-picker" id="color-menu">
+          <div class="dd-label">预设颜色</div>
+          <div class="swatches" data-swatches></div>
+          <canvas class="cp-wheel" data-wheel width="82" height="82"></canvas>
+        </div>
+      </div>
+      <button type="button" class="btn" id="btn-theme" title="外观：跟随宿主主题">外观·跟随</button>
+      <button type="button" class="btn" id="btn-light" aria-pressed="false">光源⇄视角</button>
+      <button type="button" class="btn" id="btn-light-def" aria-pressed="false">光源复位</button>
+    </div>
+    <div id="preview-strip" data-preview-strip hidden></div>
+    <div id="viewer">
+      <button type="button" class="nav-btn nav-prev" id="btn-prev" title="上一个" disabled>◀</button>
+      <button type="button" class="nav-btn nav-next" id="btn-next" title="下一个" disabled>▶</button>
+      <div class="hint" id="hint">把 STL / OBJ / PLY / GLB / 3MF / STEP / IGES 拖到这里<br>或点「打开文件」「打开文件夹」</div>
+      <div id="status" data-status></div>
+    </div>
+    <div id="info" data-info></div>
+    <div id="face-modal" style="display:none">
+      <div class="face-panel">
+        <div class="face-title">选择视角 · Esc 关闭</div>
+        <div class="face-grid">
+          <button type="button" class="face-btn" data-face="front">前</button>
+          <button type="button" class="face-btn" data-face="back">后</button>
+          <button type="button" class="face-btn" data-face="left">左</button>
+          <button type="button" class="face-btn" data-face="right">右</button>
+          <button type="button" class="face-btn" data-face="top">上</button>
+          <button type="button" class="face-btn" data-face="bottom">下</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="file-input" accept=".stl,.obj,.ply,.glb,.gltf,.3mf,.step,.stp,.iges,.igs" multiple style="display:none">
+
+  <script>
+    // 启动期错误可见化：宿主里出问题时直接在卡片上写清楚，别只剩白屏
+    window.__HMV_DIAG = { stage: 'html', ts: Date.now() };
+    window.addEventListener('error', function (e) {
+      try {
+        window.__HMV_DIAG.lastError = (e.message || '') + ' @' + ((e.lineno || '') + ':' + (e.colno || ''));
+        var box = document.getElementById('boot-error');
+        if (!box) {
+          box = document.createElement('div');
+          box.id = 'boot-error';
+          box.style.cssText = 'position:fixed;top:6px;left:6px;z-index:99999;background:#8B2C1F;color:#fff;font:12px/1.5 ui-monospace,monospace;padding:6px 10px;border-radius:6px;max-width:80vw;white-space:pre-wrap';
+          document.body.appendChild(box);
+        }
+        box.textContent = '小花模型查看器 启动错误: ' + (e.message || '') + ' @' + (e.filename || '').split('/').pop() + ':' + (e.lineno || '');
+      } catch (_x) {}
+    }, true);
+  </script>
+
+  <script src="./assets/vendor/legacy/three.min.js"></script>
+  <script src="./assets/vendor/legacy/ArcballControls.js"></script>
+  <script src="./assets/vendor/legacy/STLLoader.js"></script>
+  <script src="./assets/vendor/legacy/OBJLoader.js"></script>
+  <script src="./assets/vendor/legacy/PLYLoader.js"></script>
+  <script src="./assets/vendor/legacy/GLTFLoader.js"></script>
+  <script src="./assets/vendor/legacy/3MFLoader.js"></script>
+  <script type="module" src="./assets/viewer.js"></script>
+</body>
+</html>

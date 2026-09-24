@@ -1,0 +1,237 @@
+/* 小花模型查看器 卡片样式（Hana v2 App）
+ *
+ * 配色一律优先取宿主主题变量（宿主会把主题 CSS 注入卡片 iframe）：
+ *   --bg / --bg-card / --bg-glass / --text / --text-light / --text-muted
+ *   / --border / --shadow / --accent / --accent-hover / --accent-light
+ * 因此卡片背景天然跟随宿主主题（含用户自命名主题）。
+ * 宿主变量缺失时，回退到 html[data-em-appearance] 标记的兜底色板。
+ * 「外观」按钮可强制浅色/深色：写在 html[data-em-skin] 上，覆盖上面的来源变量。
+ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── 色板桥接层（宿主变量优先，兜底兜到底） ── */
+:root {
+  --em-c-text: var(--text, #dfe8f2);
+  --em-c-text-light: var(--text-light, #b9c8d6);
+  --em-c-text-muted: var(--text-muted, #93a4b4);
+  --em-c-card: var(--bg-card, #16202f);
+  --em-c-glass: var(--bg-glass, rgba(14, 21, 33, 0.62));
+  --em-c-border: var(--border, rgba(150, 190, 235, 0.18));
+  --em-c-shadow: var(--shadow, rgba(0, 0, 0, 0.42));
+  --em-c-accent: var(--accent, #6ebeff);
+  --em-c-accent-hover: var(--accent-hover, #8fd0ff);
+  --em-c-accent-soft: var(--accent-light, rgba(110, 190, 255, 0.14));
+  --em-c-thumb: rgba(0, 0, 0, 0.18);
+  --em-c-track: rgba(0, 0, 0, 0.28);
+  --em-c-thumbbar: rgba(140, 180, 220, 0.35);
+}
+html[data-em-appearance="light"] {
+  --em-c-text: var(--text, #33383d);
+  --em-c-text-light: var(--text-light, #5d646b);
+  --em-c-text-muted: var(--text-muted, #82898f);
+  --em-c-card: var(--bg-card, #fffdf7);
+  --em-c-glass: var(--bg-glass, rgba(255, 253, 247, 0.86));
+  --em-c-border: var(--border, rgba(120, 110, 90, 0.25));
+  --em-c-shadow: var(--shadow, rgba(60, 55, 45, 0.16));
+  --em-c-accent: var(--accent, #537d96);
+  --em-c-accent-hover: var(--accent-hover, #456a80);
+  --em-c-accent-soft: var(--accent-light, rgba(83, 125, 150, 0.12));
+  --em-c-track: rgba(120, 110, 90, 0.12);
+  --em-c-thumbbar: rgba(120, 110, 90, 0.35);
+}
+
+/* ── 手动外观覆盖（「外观」按钮） ── */
+html[data-em-skin="light"] {
+  --bg: #f8f4ed;
+  --bg-card: #fffdf7;
+  --bg-glass: rgba(255, 253, 247, 0.9);
+  --text: #3b3d3f;
+  --text-light: #6b6f73;
+  --text-muted: #8e9196;
+  --border: rgba(122, 96, 88, 0.22);
+  --shadow: rgba(59, 61, 63, 0.12);
+  --accent: #537d96;
+  --accent-hover: #456a80;
+  --accent-light: rgba(83, 125, 150, 0.12);
+}
+html[data-em-skin="dark"] {
+  --bg: #101823;
+  --bg-card: #16202f;
+  --bg-glass: rgba(14, 21, 33, 0.72);
+  --text: #dfe8f2;
+  --text-light: #b9c8d6;
+  --text-muted: #93a4b4;
+  --border: rgba(150, 190, 235, 0.2);
+  --shadow: rgba(0, 0, 0, 0.45);
+  --accent: #6ebeff;
+  --accent-hover: #8fd0ff;
+  --accent-light: rgba(110, 190, 255, 0.14);
+}
+
+/* ── 基础 ── */
+html, body { height: 100%; overflow: hidden; font-family: "Microsoft YaHei", system-ui, -apple-system, sans-serif; }
+/* 背景透明：卡片底色由宿主主题给（默认就是跟随主题） */
+body { background: transparent; color: var(--em-c-text); }
+/* 仅在手动覆盖外观时，自己把背景画出来 */
+html[data-em-skin] body { background: var(--bg, transparent); }
+
+#app { position: absolute; inset: 0; display: flex; flex-direction: column; }
+#viewer { position: relative; flex: 1 1 auto; min-height: 0; }
+
+/* ── 工具栏 ── */
+#toolbar {
+  position: relative; top: auto; left: auto; transform: none;
+  width: 100%; min-width: 0; flex: 0 0 auto; z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
+  overflow: visible; pointer-events: auto;
+  background: var(--em-c-glass); backdrop-filter: blur(8px);
+  border: none; border-bottom: 1px solid var(--em-c-border);
+  border-radius: 0;
+  padding: 8px 10px;
+}
+#toolbar .title {
+  flex: 0 0 auto; color: var(--em-c-text); font-size: 20px; font-weight: 700;
+  letter-spacing: 1px; margin-right: 6px; white-space: nowrap;
+}
+.btn {
+  position: relative; z-index: 1; flex: 0 0 auto; min-height: 32px;
+  background: transparent; color: var(--em-c-text-light);
+  border: 1px solid var(--em-c-border); border-radius: 6px;
+  padding: 6px 14px; font-size: 14px; cursor: pointer; user-select: none;
+  white-space: nowrap; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn:hover { background: var(--em-c-accent-soft); color: var(--em-c-text); }
+.btn:active { background: var(--em-c-accent-soft); color: var(--em-c-accent); }
+.btn:focus-visible { outline: 2px solid var(--em-c-accent); outline-offset: 2px; }
+.btn[aria-pressed="true"], .btn.is-on {
+  background: var(--em-c-accent-soft); border-color: var(--em-c-accent); color: var(--em-c-accent);
+}
+
+.dd { position: relative; flex: 0 0 auto; }
+.dd-menu {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 40;
+  background: var(--em-c-card); backdrop-filter: blur(10px);
+  border: 1px solid var(--em-c-border); border-radius: 10px;
+  padding: 8px; display: none; min-width: 148px;
+  box-shadow: 0 8px 28px var(--em-c-shadow); pointer-events: auto;
+}
+.dd-menu.open { display: block; }
+.dd-sec { color: var(--em-c-text-muted); font-size: 12px; padding: 6px 10px 4px; letter-spacing: 1px; }
+.dd-item {
+  display: block; width: 100%; text-align: left;
+  background: none; border: none; color: var(--em-c-text-light); font-size: 14px;
+  padding: 7px 10px; border-radius: 6px; cursor: pointer;
+}
+.dd-item:hover { background: var(--em-c-accent-soft); color: var(--em-c-accent); }
+
+/* ── 右下信息 ── */
+/* 右下信息条：只在有真内容（模型名/三角面/尺寸、加载失败提示）时出现，
+   没有模型时不占位——空态引导交给视口中央那行 hint。 */
+#info:empty { display: none; }
+#info {
+  position: absolute; right: 16px; bottom: 16px; z-index: 10;
+  color: var(--em-c-text-muted); font-size: 14px; line-height: 1.8;
+  text-align: right; pointer-events: none;
+  background: var(--em-c-glass); border-radius: 8px; padding: 10px 14px;
+  border: 1px solid var(--em-c-border);
+  font-variant-numeric: tabular-nums;
+}
+#info b { color: var(--em-c-accent); font-weight: 600; }
+
+/* ── 视角选择弹层 ── */
+#face-modal {
+  position: absolute; inset: 0; z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.28);
+}
+.face-panel {
+  background: var(--em-c-card); backdrop-filter: blur(12px);
+  border: 1px solid var(--em-c-border); border-radius: 14px;
+  padding: 18px 22px; box-shadow: 0 12px 40px var(--em-c-shadow);
+}
+.face-title { color: var(--em-c-text); font-size: 14px; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
+.face-grid { display: grid; grid-template-columns: repeat(3, 64px); gap: 10px; }
+.face-btn {
+  background: transparent; color: var(--em-c-text-light);
+  border: 1px solid var(--em-c-border); border-radius: 8px;
+  padding: 12px 0; font-size: 15px; cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+.face-btn:hover { background: var(--em-c-accent-soft); color: var(--em-c-accent); transform: translateY(-2px); }
+
+/* ── 预览条（打开文件夹后的横向缩略图） ── */
+#preview-strip {
+  position: relative; top: auto; left: auto; transform: none;
+  flex: 0 0 auto; z-index: 9; display: flex; gap: 8px; align-items: stretch;
+  max-width: 100%; min-width: 0; width: auto;
+  overflow-x: auto; overflow-y: hidden;
+  padding: 8px 10px;
+  background: var(--em-c-glass); backdrop-filter: blur(8px);
+  border: none; border-bottom: 1px solid var(--em-c-border);
+  scrollbar-width: thin; scrollbar-color: var(--em-c-thumbbar) var(--em-c-track);
+}
+#preview-strip[hidden] { display: none; }
+#preview-strip::-webkit-scrollbar { height: 8px; }
+#preview-strip::-webkit-scrollbar-track { background: var(--em-c-track); border-radius: 4px; }
+#preview-strip::-webkit-scrollbar-thumb {
+  background: var(--em-c-thumbbar); border-radius: 4px; border: 1px solid var(--em-c-border);
+}
+.pv-item {
+  flex: 0 0 auto; width: 92px; cursor: pointer; user-select: none;
+  border: 1px solid var(--em-c-border); border-radius: 8px; overflow: hidden;
+  background: transparent;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pv-item:hover { border-color: var(--em-c-accent); }
+.pv-item.active { border-color: var(--em-c-accent); background: var(--em-c-accent-soft); }
+.pv-item.failed { opacity: 0.45; }
+.pv-thumb {
+  width: 100%; height: 62px; background: var(--em-c-thumb);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.pv-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.pv-thumb .pv-spin { color: var(--em-c-text-muted); font-size: 11px; }
+.pv-name {
+  padding: 4px 6px; font-size: 11px; color: var(--em-c-text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+}
+
+/* ── 主视图导航按钮 + 提示 + 状态 ── */
+#viewer .nav-btn {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 8;
+  width: 36px; height: 48px; border: 1px solid var(--em-c-border); border-radius: 8px; cursor: pointer;
+  background: var(--em-c-glass); color: var(--em-c-text-light); font-size: 16px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+#viewer .nav-btn:hover:not(:disabled) { background: var(--em-c-accent-soft); color: var(--em-c-accent); border-color: var(--em-c-accent); }
+#viewer .nav-btn:disabled { opacity: 0.25; cursor: default; }
+#viewer .nav-prev { left: 10px; }
+#viewer .nav-next { right: 10px; }
+#viewer .hint {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  color: var(--em-c-text-muted); font-size: 15px; text-align: center;
+  pointer-events: none; line-height: 2; z-index: 2;
+}
+#viewer #status {
+  position: absolute; right: 12px; bottom: 12px; z-index: 8;
+  color: var(--em-c-text-muted); font-size: 13px; font-family: ui-monospace, monospace;
+  background: var(--em-c-glass); padding: 3px 8px; border-radius: 4px;
+  border: 1px solid var(--em-c-border);
+  max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── 颜色选择器（色板 + 色轮） ── */
+.color-picker { min-width: 158px; }
+.dd-label { color: var(--em-c-text-muted); font-size: 12px; padding: 4px 6px 2px; letter-spacing: 1px; }
+.swatches { display: grid; grid-template-columns: repeat(4, 30px); gap: 8px; padding: 6px 6px 2px; }
+.sw {
+  width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--em-c-border);
+  cursor: pointer; transition: transform 0.12s, border-color 0.12s; padding: 0;
+}
+.sw:hover { transform: scale(1.12); border-color: var(--em-c-accent); }
+.cp-wheel {
+  width: 82px; height: 82px; border-radius: 50%; cursor: crosshair;
+  margin: 8px auto 4px; display: block; border: 1px solid var(--em-c-border);
+}
