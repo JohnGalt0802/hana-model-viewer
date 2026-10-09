@@ -7,7 +7,7 @@
 - **版本**：3.1.0（2026-09-24 由 EasyModel 迁移为 v2 App 并改名）
 - **支持格式**：STL / OBJ / PLY / GLB / GLTF / 3MF（网格直读）；STEP / STP / IGES / IGS（需可选依赖，见下）
 - **作者**：John Galt
-- **品牌资产**：身份图标 `assets/icon.png`（512×512）、卡片封面 `ui/assets/cover.png`（1200×750）
+- **品牌资产**：身份图标 `assets/icon.png`（512×512）、卡片封面 `ui/assets/cover.png`（768×1152，2:3，匹配卡片中心磁贴）
 
 > 命名约定与同族 App 一致：`id` 用句柄（`hana-model-viewer`），`name` 用英文显示名（`Hana-model-viewer`），中文名随 `description` 与卡片标题出现。
 
@@ -69,7 +69,7 @@ hana-model-viewer/
         ├── sdk.js                # 浏览器端 SDK（hana 对象）
         ├── viewer.js             # 渲染核心：three.js 场景 + 交互 + 主题跟随
         ├── viewer.css            # 样式：配色全部取自宿主主题变量
-        ├── cover.png             # 卡片封面（face，1200×750）
+        ├── cover.png             # 卡片封面（face，768×1152，2:3）
         └── vendor/legacy/        # three.js 与各格式 Loader（UMD，随包分发）
 ```
 
