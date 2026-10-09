@@ -1,0 +1,20 @@
+# ── 本地设计过程目录 ──
+# icon/ 是 App 图标与卡片封面的设计工作区（ComfyUI 原始出图、精修候选、
+# 临时预览、提示词记录与精修脚本），正式产物在 assets/icon.png 与
+# ui/assets/cover.png，均已入库。过程稿不入库。
+icon/
+
+# ── 备份文件 ──
+*.bak
+*.bak-*
+
+# ── 操作系统 / 编辑器噪声 ──
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+*.swo
+*~
+
+# ── 依赖 ──
+node_modules/

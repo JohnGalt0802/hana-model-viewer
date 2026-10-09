@@ -7,6 +7,7 @@
 - **版本**：3.1.0（2026-09-24 由 EasyModel 迁移为 v2 App 并改名）
 - **支持格式**：STL / OBJ / PLY / GLB / GLTF / 3MF（网格直读）；STEP / STP / IGES / IGS（需可选依赖，见下）
 - **作者**：John Galt
+- **品牌资产**：身份图标 `assets/icon.png`（512×512）、卡片封面 `ui/assets/cover.png`（1200×750）
 
 > 命名约定与同族 App 一致：`id` 用句柄（`hana-model-viewer`），`name` 用英文显示名（`Hana-model-viewer`），中文名随 `description` 与卡片标题出现。
 
@@ -58,6 +59,7 @@ hana-model-viewer/
 ├── manifest.json                 # v2 清单（cards / capabilities / icon）
 ├── index.js                      # defineApp 入口：工具 + /model /scan 路由
 ├── README.md
+├── PROJECT_LOG.md                # 开发日志：缘起 / 进度 / 验证清单 / 踩坑
 ├── assets/
 │   └── icon.png                  # App 身份图标（512×512）
 ├── sdk/                          # 随包分发的 @hana/app-sdk 服务端构建产物
@@ -67,9 +69,11 @@ hana-model-viewer/
         ├── sdk.js                # 浏览器端 SDK（hana 对象）
         ├── viewer.js             # 渲染核心：three.js 场景 + 交互 + 主题跟随
         ├── viewer.css            # 样式：配色全部取自宿主主题变量
-        ├── cover.png             # 卡片封面（face）
+        ├── cover.png             # 卡片封面（face，1200×750）
         └── vendor/legacy/        # three.js 与各格式 Loader（UMD，随包分发）
 ```
+
+`icon/` 不在上面的树里：它是图标与封面的本地设计过程目录（原始出图、精修候选、临时预览），已由 `.gitignore` 忽略，不入库。
 
 ## 主题跟随
 
@@ -109,7 +113,8 @@ hana-model-viewer/
 
 ## 版本
 
-- 3.1.0（2026-09-24）：改名 Hana-model-viewer / 小花模型查看器；工具名改为 `hana_model_viewer_open_model`；卡片标题用中文；坐标轴重做（细杆 + 锥头 + 球心 + 受光材质 + X/Y/Z 字标，随主题调色）；移除右下空态提示条
+- 3.1.0（2026-09-24）：改名 Hana-model-viewer / 小花模型查看器；工具名改为 `hana_model_viewer_open_model`；卡片标题用中文；坐标轴重做（细杆 + 锥头 + 球心 + 受光材质 + X/Y/Z 字标，随主题调色）；移除右下空态提示条；移除工具栏品牌字「小花」
+- 3.1.0（2026-10-10，品牌更新）：更换 App 身份图标与卡片封面（等轴测金属字风格），清单版本号不变
 - 3.0.0（2026-09-24）：迁移为 Hana v2 App；背景与配色跟随宿主主题；卡片可拆窗；文件读写改走 ResourceIO
 - 2.0.1（2026-08-26）：修复卡片顶部按钮命中区域与常驻变色
 - 2.0.0（2026-08-23）：移除 right/center 二选一配置
